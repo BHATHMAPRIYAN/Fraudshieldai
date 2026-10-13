@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FraudShield AI | Fraud & AML Intelligence</title>
+<style>
+:root {
+  --bg:#07111f; --panel:#0d1b2e; --border:#20344f;
+  --text:#edf5ff; --muted:#91a6c2; --cyan:#21d4fd;
+  --green:#27e0a3; --red:#ff526d; --orange:#ffb547;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:225px;padding:24px 14px;background:#091627;
+border-right:1px solid var(--border);flex-shrink:0}
+.brand{font-size:21px;font-weight:800;color:var(--cyan)}
+.brand small{display:block;font-size:10px;color:var(--muted);
+font-weight:400;margin-top:6px}
+.nav{margin-top:35px}
+.nav button{display:block;width:100%;text-align:left;padding:13px;
+margin:5px 0;border:0;border-radius:8px;background:transparent;
+color:var(--muted)}
+.nav button.active,.nav button:hover{background:#103147;color:var(--cyan)}
+.sidebar-note{margin-top:45px;padding:12px;border:1px solid var(--border);
+border-radius:9px;font-size:12px;color:var(--green)}
+main{flex:1;min-width:0;padding:24px}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+gap:15px;flex-wrap:wrap;margin-bottom:30px}
+.topbar input{background:var(--panel);border:1px solid var(--border);
+border-radius:8px;padding:12px;color:white;width:min(100%,400px)}
+.pill{font-size:11px;padding:6px 9px;border-radius:20px;
+background:#12392f;color:var(--green)}
+h1{font-size:26px;margin:0 0 8px}
+h2{font-size:16px;margin:0 0 18px}
+.sub{color:var(--muted);font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));
+gap:12px;margin:24px 0}
+.panel,.metric{background:var(--panel);border:1px solid var(--border);
+border-radius:11px;padding:17px;min-width:0}
+.metric .label{font-size:12px;color:var(--muted)}
+.metric .number{font-size:27px;font-weight:750;margin:13px 0 8px}
+.cyan{color:var(--cyan)}.green{color:var(--green)}
+.red{color:var(--red)}.orange{color:var(--orange)}
+.grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
+.wide{grid-column:span 2}
+.chart{height:180px;display:flex;align-items:end;gap:8px;
+padding:12px 2px 0;border-bottom:1px solid var(--border)}
+.bar{flex:1;min-width:5px;border-radius:4px 4px 0 0;
+background:linear-gradient(#21d4fd,#1766a0);position:relative}
+.bar:hover{opacity:.7}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;
+color:var(--muted);margin-top:13px}
+.pattern{display:flex;justify-content:space-between;gap:10px;
+padding:12px 0;border-bottom:1px solid var(--border);font-size:12px}
+.pattern:last-child{border:0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.action{padding:14px 8px;background:#10253a;border:1px solid var(--border);
+border-radius:8px;color:var(--cyan)}
+.action:hover{border-color:var(--cyan)}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:500}
+td{white-space:nowrap}
+.table-wrap{overflow-x:auto}
+.status{border-radius:5px;padding:4px 7px;font-size:10px;
+background:#30283a;color:var(--orange)}
+.status.high{background:#401e2c;color:#ff7b8d}
+.status.low{background:#12382f;color:var(--green)}
+.score{font-weight:bold}
+.network{height:230px;position:relative;overflow:hidden}
+.node{position:absolute;border:1px solid var(--cyan);border-radius:50%;
+width:46px;height:46px;display:grid;place-items:center;
+font-size:10px;background:#123147}
+.center{left:43%;top:39%;border-color:var(--red);color:var(--red)}
+.n1{left:8%;top:12%}.n2{left:70%;top:8%}.n3{left:76%;top:67%}
+.n4{left:13%;top:72%}.n5{left:44%;top:78%}
+.link{position:absolute;height:1px;background:var(--cyan);
+width:39%;left:17%;top:32%;transform:rotate(23deg)}
+.alert{padding:12px 0;border-bottom:1px solid var(--border);
+font-size:12px}.alert:last-child{border:0}
+footer{color:var(--muted);font-size:11px;padding:25px 0 5px}
+button:focus,input:focus{outline:1px solid var(--cyan)}
+@media(max-width:1050px){
+ .metrics{grid-template-columns:repeat(3,1fr)}
+ .grid{grid-template-columns:1fr 1fr}
+ .wide{grid-column:span 2}
+}
+@media(max-width:650px){
+ .sidebar{width:100%;padding:13px;border-right:0;
+ border-bottom:1px solid var(--border)}
+ .app{display:block}.nav{display:flex;overflow-x:auto;margin-top:15px}
+ .nav button{min-width:max-content;width:auto;margin-right:5px}
+ .sidebar-note{display:none}main{padding:15px}
+ .metrics{grid-template-columns:1fr 1fr}
+ .grid{grid-template-columns:1fr}
+ .wide{grid-column:span 1}
+ h1{font-size:22px}.metric .number{font-size:23px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">⬡ FraudShield AI
+    <small>Real-Time Fraud & AML Risk Orchestration</small>
+  </div>
+  <div class="nav">
+    <button class="active" data-page="Dashboard">◈ Dashboard</button>
+    <button data-page="Transactions">▤ Transactions</button>
+    <button data-page="Network Explorer">⌘ Network Explorer</button>
+    <button data-page="Investigations">◉ Investigations</button>
+    <button data-page="Risk Explanation">✧ Risk Explanation</button>
+    <button data-page="Evaluation">▦ Model Evaluation</button>
+  </div>
+  <div class="sidebar-note">● Demo system online<br><br>
+  Synthetic data only</div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <input id="search" placeholder="Search transactions or accounts...">
+    <span class="pill">● DEMO MODE</span>
+  </div>
+
+  <h1 id="pageTitle">Fraud intelligence dashboard</h1>
+  <div class="sub">Detect the Pattern. Understand the Risk. Orchestrate the Response.</div>
+
+  <section class="metrics">
+    <div class="metric"><div class="label">Total Transactions</div>
+      <div class="number" id="total">1,284</div><div class="sub">Demo dataset</div></div>
+    <div class="metric"><div class="label">High Risk</div>
+      <div class="number red" id="high">3</div><div class="sub">Score ≥ 70</div></div>
+    <div class="metric"><div class="label">Flagged for Review</div>
+      <div class="number orange" id="flagged">3</div><div class="sub">Needs investigation</div></div>
+    <div class="metric"><div class="label">AML Patterns</div>
+      <div class="number cyan" id="amlCount">2</div><div class="sub">Synthetic examples</div></div>
+    <div class="metric"><div class="label">System Status</div>
+      <div class="number green" style="font-size:20px">READY</div><div class="sub">Local demo</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h2>Transaction Risk Overview</h2>
+      <div class="sub">Illustrative transaction volume by interval</div>
+      <div class="chart" id="chart"></div>
+      <div class="legend"><span class="cyan">■ Transaction activity</span>
+      <span class="red">■ High-risk events are scored separately</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>Risk Distribution</h2>
+      <div id="distribution"></div>
+      <div class="sub" style="margin-top:15px">Based on current demo transactions</div>
+    </div>
+
+    <div class="panel">
+      <h2>AML Pattern Monitor</h2>
+      <div class="pattern"><span>Structuring / splitting</span><b class="orange">DEMO</b></div>
+      <div class="pattern"><span>Rapid fund movement</span><b class="red">DEMO</b></div>
+      <div class="pattern"><span>Circular transfers</span><b class="orange">DEMO</b></div>
+      <div class="pattern"><span>Connected accounts</span><b class="cyan">DEMO</b></div>
+      <p class="sub">Illustrative patterns, not confirmed money laundering.</p>
+      <button class="action" onclick="scanAML()">Run AML scan</button>
+    </div>
+
+    <div class="panel wide">
+      <h2>Recent Transactions</h2>
+      <div class="sub" style="margin-bottom:12px">Select a transaction to inspect its risk explanation.</div>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>From</th><th>To</th>
+        <th>Amount</th><th>Score</th><th>Status</th></tr></thead>
+        <tbody id="transactions"></tbody>
+      </table>
+      </div>
+      <div id="details" class="sub" style="margin-top:15px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Account Network Explorer</h2>
+      <div class="sub">Illustrative account relationships</div>
+      <div class="network">
+        <div class="link"></div>
+        <div class="node center">A1001</div>
+        <div class="node n1">A1002</div>
+        <div class="node n2">A1003</div>
+        <div class="node n3">A1004</div>
+        <div class="node n4">A1005</div>
+        <div class="node n5">A1006</div>
+      </div>
+      <div class="sub">Connections are illustrative, not inferred from live bank data.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Fraud Alerts</h2>
+      <div id="alerts"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Actions</h2>
+      <div class="actions">
+        <button class="action" onclick="simulate()">＋<br>Simulate Transaction</button>
+        <button class="action" onclick="scanAML()">⌘<br>Run AML Analysis</button>
+        <button class="action" onclick="showEvaluation()">▦<br>View Evaluation</button>
+        <button class="action" onclick="downloadReport()">↓<br>Export CSV</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Evaluation Metrics</h2>
+      <div class="pattern"><span>Precision</span><b id="precision">Not evaluated</b></div>
+      <div class="pattern"><span>Recall</span><b id="recall">Not evaluated</b></div>
+      <div class="pattern"><span>False-positive rate</span><b id="fpr">Not evaluated</b></div>
+      <div class="pattern"><span>Detection latency</span><b id="latency">Not measured</b></div>
+      <p class="sub">Use labelled test data to calculate valid metrics.</p>
+    </div>
+  </section>
+  <footer>FraudShield AI · Hackathon prototype · Synthetic data only</footer>
+</main>
+</div>
+
+<script>
+const transactions = [
+ {id:"TX1001",from:"A1001",to:"A1003",amount:12500,score:82,
+  reasons:["Unusually large amount","New recipient"],label:1},
+ {id:"TX1002",from:"A1002",to:"A1004",amount:850,score:18,
+  reasons:["Amount within demo baseline"],label:0},
+ {id:"TX1003",from:"A1003",to:"A1005",amount:9800,score:74,
+  reasons:["Rapid transfer pattern","Unusual amount"],label:1},
+ {id:"TX1004",from:"A1005",to:"A1006",amount:1200,score:26,
+  reasons:["No major demo risk signals"],label:0},
+ {id:"TX1005",from:"A1001",to:"A1004",amount:22000,score:91,
+  reasons:["Very large amount","High-risk demo profile"],label:1},
+ {id:"TX1006",from:"A1004",to:"A1002",amount:4600,score:45,
+  reasons:["Moderate amount","Requires context"],label:0}
+];
+
+const money = n => "$" + n.toLocaleString("en-US");
+const risk = s => s >= 70 ? "High" : s >= 40 ? "Review" : "Low";
+const statusClass = s => s >= 70 ? "high" : s >= 40 ? "" : "low";
+
+function render(){
+ const q = document.getElementById("search").value.toLowerCase();
+ const filtered = transactions.filter(t =>
+  [t.id,t.from,t.to,String(t.amount)].join(" ").toLowerCase().includes(q));
+ document.getElementById("transactions").innerHTML = filtered.map(t =>
+ `<tr>
+ <td><button class="action" onclick="inspect('${t.id}')">${t.id}</button></td>
+ <td>${t.from}</td><td>${t.to}</td><td>${money(t.amount)}</td>
+ <td class="score">${t.score}/100</td>
+ <td><span class="status ${statusClass(t.score)}">${risk(t.score)}</span></td>
+ </tr>`).join("");
+
+ document.getElementById("total").textContent = (1284 + transactions.length - 6).toLocaleString();
+ document.getElementById("high").textContent = transactions.filter(t=>t.score>=70).length;
+ document.getElementById("flagged").textContent = transactions.filter(t=>t.score>=40).length;
+
+ const bins = [
+  ["Low",transactions.filter(t=>t.score<40).length,"green"],
+  ["Review",transactions.filter(t=>t.score>=40&&t.score<70).length,"orange"],
+  ["High",transactions.filter(t=>t.score>=70).length,"red"]
+ ];
+ document.getElementById("distribution").innerHTML = bins.map(b =>
+ `<div class="pattern"><span>${b[0]} risk</span>
+ <b class="${b[2]}">${b[1]} transactions</b></div>`).join("");
+
+ document.getElementById("alerts").innerHTML = transactions
+ .filter(t=>t.score>=70).map(t=>
+ `<div class="alert"><b class="red">${t.id}</b><br>
+ ${t.from} → ${t.to}<br>${money(t.amount)} · Score ${t.score}</div>`).join("")
+ || '<div class="sub">No high-risk demo transactions.</div>';
+
+ document.getElementById("amlCount").textContent = "2";
+}
+
+function inspect(id){
+ const t = transactions.find(x=>x.id===id);
+ if(!t)return;
+ document.getElementById("details").innerHTML =
+ `<b>${t.id} — ${risk(t.score)} risk</b><br>
+ Amount: ${money(t.amount)} · Risk score: ${t.score}/100<br>
+ Explanation: ${t.reasons.join("; ")}.<br>
+ Recommended response: ${t.score>=70 ? "Prioritise for human review." :
+ t.score>=40 ? "Request additional context." :
+ "Continue normal monitoring."}
+ <br><br><i>This is a demo heuristic, not a verified fraud finding.</i>`;
+}
+
+function simulate(){
+ const start = performance.now();
+ const amount = Math.floor(Math.random()*24000)+500;
+ const unusual = Math.random() > 0.5;
+ const score = Math.min(99,Math.round(
+  (amount>10000?45:amount>5000?25:10)+(unusual?25:0)+Math.random()*20));
+ transactions.unshift({
+  id:"TX"+(1000+transactions.length+1),
+  from:"A100"+(1+Math.floor(Math.random()*6)),
+  to:"A100"+(1+Math.floor(Math.random()*6)),
+  amount,score,
+  reasons:[amount>10000?"Large demo amount":"Moderate demo amount",
+  unusual?"Synthetic unusual-activity signal":"No synthetic anomaly signal"],
+  label: score>=70 ? 1 : 0
+ });
+ render();
+ inspect(transactions[0].id);
+ document.getElementById("latency").textContent =
+ Math.round(performance.now()-start)+" ms (local demo)";
+}
+
+function scanAML(){
+ const counts = {};
+ transactions.forEach(t=>{
+  counts[t.from]=(counts[t.from]||0)+1;
+ });
+ const repeated = Object.entries(counts).filter(([a,n])=>n>=2);
+ const message = repeated.length
+  ? "Repeated outgoing activity found for: "+repeated.map(x=>x[0]).join(", ")
+  : "No repeated outgoing activity found in this small demo dataset.";
+ alert("AML demo scan complete\n\n"+message+
+ "\n\nThis is a simple screening heuristic, not a confirmed AML pattern.");
+}
+
+function showEvaluation(){
+ const predicted = transactions.map(t=>t.score>=70?1:0);
+ const actual = transactions.map(t=>t.label);
+ let tp=0,fp=0,fn=0,tn=0;
+ predicted.forEach((p,i)=>{
+  if(p===1&&actual[i]===1)tp++;
+  else if(p===1&&actual[i]===0)fp++;
+  else if(p===0&&actual[i]===1)fn++;
+  else tn++;
+ });
+ const pct=(a,b)=>b?(100*a/b).toFixed(1)+"%":"N/A";
+ document.getElementById("precision").textContent=pct(tp,tp+fp);
+ document.getElementById("recall").textContent=pct(tp,tp+fn);
+ document.getElementById("fpr").textContent=pct(fp,fp+tn);
+ alert("Demo evaluation calculated from embedded labels. These are not real-world model metrics.");
+}
+
+function downloadReport(){
+ const rows=[["id","from","to","amount","score","risk"],
+ ...transactions.map(t=>[t.id,t.from,t.to,t.amount,t.score,risk(t.score)])];
+ const csv=rows.map(row=>row.join(",")).join("\n");
+ const blob=new Blob([csv],{type:"text/csv"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download="fraudshield-demo-report.csv";a.click();
+ URL.revokeObjectURL(url);
+}
+
+document.getElementById("search").addEventListener("input",render);
+document.querySelectorAll("[data-page]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  document.querySelectorAll("[data-page]").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("pageTitle").textContent=btn.dataset.page;
+  if(btn.dataset.page==="Evaluation")showEvaluation();
+  if(btn.dataset.page==="Risk Explanation")inspect(transactions[0].id);
+  if(btn.dataset.page==="Network Explorer")scanAML();
+ });
+});
+
+document.getElementById("chart").innerHTML =
+ [30,42,36,60,48,72,54,67,44,82,63,91].map((v,i)=>
+ `<div class="bar" title="Interval ${i+1}: ${v} units" style="height:${v}%"></div>`
+ ).join("");
+
+render();
+</script>
+</body>
+</html>
